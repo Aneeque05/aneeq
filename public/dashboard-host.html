@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Host Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .adv-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .adv-table th,
+        .adv-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .adv-table th {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Local<span>Adventure</span></a>
+            <ul class="nav-links" id="nav-links"></ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <h1>Host Dashboard</h1>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('adventures')">My Adventures</div>
+            <div class="tab" onclick="switchTab('bookings')">Bookings Received</div>
+            <div class="tab" onclick="switchTab('create')">Add New Adventure</div>
+        </div>
+
+        <div id="adventures" class="tab-content active">
+            <!-- List Adventures -->
+            <div id="host-adventures-list">Loading...</div>
+        </div>
+
+        <div id="bookings" class="tab-content">
+            <table class="adv-table">
+                <thead>
+                    <tr>
+                        <th>Adventure</th>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Participants</th>
+                        <th>Income</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="host-bookings-list"></tbody>
+            </table>
+        </div>
+
+        <div id="create" class="tab-content">
+            <form id="createAdventureForm"
+                style="max-width: 600px; background: white; padding: 30px; box-shadow: var(--shadow); border-radius: 8px;">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" class="form-control">
+                        <option>Trekking</option>
+                        <option>Water</option>
+                        <option>Camping</option>
+                        <option>Biking</option>
+                        <option>Nature</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <select name="difficulty" class="form-control">
+                        <option>Easy</option>
+                        <option>Medium</option>
+                        <option>Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location (City)</label>
+                    <input type="text" name="city" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Address</label>
+                    <input type="text" name="location" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Price Per Person</label>
+                    <input type="number" name="pricePerPerson" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Max Seats</label>
+                    <input type="number" name="maxSeats" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" name="duration" class="form-control" placeholder="e.g. 2 Days / 1 Night"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="text" name="image" class="form-control" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn">Create Adventure</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const { user } = checkAuth();
+        if (!user || user.role !== 'host') window.location.href = 'index.html';
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Find tab by text logic is brittle, simplier to just assume order or add ids. 
+            // Simple hack for active class on tab buttons
+            const tabEl = Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tabId.split(' ')[0]) || (tabId === 'create' && t.innerText.includes('Add')) || (tabId === 'adventures' && t.innerText.includes('My')));
+            if (tabEl) tabEl.classList.add('active'); // This logic is weak, better use direct onclick binding
+
+            // Just show content
+            document.getElementById(tabId).classList.add('active');
+
+            // Add active class to button properly
+            if (tabId === 'adventures') document.querySelectorAll('.tab')[0].classList.add('active');
+            if (tabId === 'bookings') document.querySelectorAll('.tab')[1].classList.add('active');
+            if (tabId === 'create') document.querySelectorAll('.tab')[2].classList.add('active');
+        }
+
+        async function loadHostData() {
+            // Load Bookings
+            const resBookings = await fetchClient('/bookings/hostbookings');
+            const bookingsList = document.getElementById('host-bookings-list');
+            bookingsList.innerHTML = resBookings.data.map(b => `
+                <tr>
+                    <td>${b.adventure.title}</td>
+                    <td>${b.user.name}</td>
+                    <td>${new Date(b.bookingDate).toLocaleDateString()}</td>
+                    <td>${b.participants}</td>
+                    <td>₹${b.totalPrice}</td>
+                    <td><span class="badge" style="background:${b.status === 'confirmed' ? 'lightgreen' : 'lightgray'}">${b.status}</span></td>
+                </tr>
+            `).join('');
+
+            // Load Adventures (Need a My Adventures Endpoint or filter)
+            // Using generic Search with host ID logic or just filtering client side if volume low,
+            // standard approach: /adventures?host=ME
+            // Our Controller doesn't support ?host=ID specifically unless we enabled it.
+            // Wait, getAdventures finds by query... so `host: req.user.id` isn't auto applied. 
+            // Let's rely on standard find({ ...req.query }). But `host` is correct field mapping.
+            // So ?host=USERID should work if I pass it.
+            const resAdventures = await fetchClient(`/adventures?host=${user.id}`);
+            const advList = document.getElementById('host-adventures-list');
+            advList.innerHTML = resAdventures.data.map(adv => `
+                <div class="card" style="margin-bottom: 20px; display: flex; padding: 20px;">
+                    <img src="${adv.images[0]}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 20px;">
+                    <div>
+                        <h3>${adv.title}</h3>
+                        <p>${adv.category} | ₹${adv.pricePerPerson}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('createAdventureForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.images = [data.image]; // Simple single image handler
+            delete data.image;
+
+            try {
+                await fetchClient('/adventures', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                alert('Adventure Created!');
+                switchTab('adventures');
+                loadHostData();
+                e.target.reset();
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+
+        loadHostData();
+    </script>
+</body>
+
+</html>

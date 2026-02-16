@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Adventure Booking | Discover, Book, Experience</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/card.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <nav class="navbar" style="background:transparent; position:absolute; top:0; width:100%; box-shadow:none;">
+    <div class="container">
+      <a href="index.html" class="logo"
+        style="color:white; text-shadow: 1px 1px 2px black;">Local<span>Adventure</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" style="color:white; text-shadow: 1px 1px 2px black;">Home</a>
+        <a href="adventure-listing.html" style="color:white; text-shadow: 1px 1px 2px black;">Adventures</a>
+        <a href="become-host.html" style="color:white; text-shadow: 1px 1px 2px black;">Become a Host</a>
+        <a href="login.html" id="authLink" style="color:white; text-shadow: 1px 1px 2px black;">Login</a>
+        <a href="dashboard-user.html" id="dashboardLink" style="display:none; color:white;">Dashboard</a>
+        <a href="#" id="logoutBtn" style="display:none; color:white;">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 1. Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <p class="hero-tagline">Explore. Book. Experience.</p>
+      <h1>Discover Local Adventures Around You</h1>
+
+      <form action="adventure-listing.html" method="GET" class="search-box">
+        <input type="text" name="keyword" class="search-input" placeholder="Where do you want to go?">
+        <div class="search-divider"></div>
+        <input type="date" class="search-input" style="max-width:150px;">
+        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+      </form>
+
+      <div class="popular-tags">
+        Popular:
+        <a href="adventure-listing.html?keyword=Trekking">Trekking</a>
+        <a href="adventure-listing.html?keyword=Munnar">Munnar</a>
+        <a href="adventure-listing.html?keyword=Camping">Camping</a>
+        <a href="adventure-listing.html?keyword=Kayaking">Kayaking</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 2. Explore By Category -->
+    <section class="section-block" style="text-align: center; margin-top: 50px;">
+      <h2 class="section-title">Explore by Category</h2>
+      <div class="categories">
+        <a href="adventure-listing.html?category=Trekking" class="category-card">
+          <i class="fas fa-hiking"></i>
+          <h3>Trekking</h3>
+        </a>
+        <a href="adventure-listing.html?category=Water" class="category-card">
+          <i class="fas fa-water"></i>
+          <h3>Water</h3>
+        </a>
+        <a href="adventure-listing.html?category=Camping" class="category-card">
+          <i class="fas fa-campground"></i>
+          <h3>Camping</h3>
+        </a>
+        <a href="adventure-listing.html?category=Biking" class="category-card">
+          <i class="fas fa-bicycle"></i>
+          <h3>Biking</h3>
+        </a>
+      </div>
+    </section>
+
+    <!-- 3. Trending Adventures -->
+    <section class="section-block">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 class="section-title" style="margin-bottom:0;">Trending Adventures <i class="fas fa-fire"
+            style="color:orange"></i></h2>
+        <a href="adventure-listing.html" style="color:var(--primary-color); font-weight:600;">View All</a>
+      </div>
+      <div class="trending-grid" id="trending-grid">
+        <!-- Loaded by JS -->
+        <div style="grid-column:1/-1; text-align:center;">Loading trending...</div>
+      </div>
+    </section>
+
+    <!-- 4. Top Destinations -->
+    <section class="section-block">
+      <h2 class="section-title">Top Destinations</h2>
+      <div class="destination-grid">
+        <a href="adventure-listing.html?keyword=Munnar" class="dest-card">
+          <img
+            src="https://images.unsplash.com/photo-1596328892188-125026b9776d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+            alt="Munnar">
+          <div class="dest-info">
+            <h3>Munnar</h3>
+            <p>Hills & Tea Gardens</p>
+          </div>
+        </a>
+        <a href="adventure-listing.html?keyword=Rishikesh" class="dest-card">
+          <img
+            src="https://images.unsplash.com/photo-1549488347-1f99c274f88e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+            alt="Rishikesh">
+          <div class="dest-info">
+            <h3>Rishikesh</h3>
+            <p>Rafting Capital</p>
+          </div>
+        </a>
+        <a href="adventure-listing.html?keyword=Goa" class="dest-card">
+          <img
+            src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+            alt="Goa">
+          <div class="dest-info">
+            <h3>Goa</h3>
+            <p>Beaches & Parties</p>
+          </div>
+        </a>
+        <a href="adventure-listing.html?keyword=Manali" class="dest-card">
+          <img
+            src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+            alt="Manali">
+          <div class="dest-info">
+            <h3>Manali</h3>
+            <p>Snow & Mountains</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 5. Why Choose Us -->
+    <section class="why-us-section">
+      <h2 class="section-title">Why Choose Local Adventure?</h2>
+      <p>We provide the best experiences with safety and comfort.</p>
+      <div class="features-grid container">
+        <div class="feature-item">
+          <i class="fas fa-user-shield"></i>
+          <h3>Verified Experts</h3>
+          <p>All our hosts and guides are verified professionals.</p>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-heartbeat"></i>
+          <h3>Safe & Secure</h3>
+          <p>Safety is our priority. We ensure top-notch equipment.</p>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-check-circle"></i>
+          <h3>Easy Booking</h3>
+          <p>Seamless booking process with instant confirmation.</p>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-tags"></i>
+          <h3>Best Price</h3>
+          <p>We guarantee the best prices for local adventures.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Featured Experiences -->
+    <section class="section-block">
+      <h2 class="section-title">Featured Experiences</h2>
+      <div class="adventure-grid" id="featured-grid">
+        <!-- Loaded by JS -->
+      </div>
+    </section>
+
+    <!-- 7. Customers & Testimonials -->
+    <section class="testimonials-section">
+      <h2 class="section-title">What Our Adventurers Say</h2>
+      <div class="testimonial-scroll">
+        <div class="testimonial-card">
+          <div class="user-info">
+            <div class="user-avatar"
+              style="background-image:url('https://randomuser.me/api/portraits/men/32.jpg'); background-size:cover;">
+            </div>
+            <div>
+              <h4>Rahul Sharma</h4>
+              <div style="color:gold;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                  class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            </div>
+          </div>
+          <p>"Amazing experience! The trekking guide was very professional and the view was breathtaking. Highly
+            recommended!"</p>
+        </div>
+        <div class="testimonial-card">
+          <div class="user-info">
+            <div class="user-avatar"
+              style="background-image:url('https://randomuser.me/api/portraits/women/44.jpg'); background-size:cover;">
+            </div>
+            <div>
+              <h4>Priya Patel</h4>
+              <div style="color:gold;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                  class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+            </div>
+          </div>
+          <p>"Booking was very easy. The camping site was safe and clean. We had a great bonfire night."</p>
+        </div>
+        <div class="testimonial-card">
+          <div class="user-info">
+            <div class="user-avatar"
+              style="background-image:url('https://randomuser.me/api/portraits/men/11.jpg'); background-size:cover;">
+            </div>
+            <div>
+              <h4>Amit Verma</h4>
+              <div style="color:gold;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                  class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            </div>
+          </div>
+          <p>"The river rafting was thrilling! Everything was well organized. Will definitely book again."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Host CTA -->
+    <section class="host-cta">
+      <h2>Do you organize adventures?</h2>
+      <p style="font-size:1.2rem; margin:20px 0;">Join us as a host and reach thousands of adventure seekers.</p>
+      <a href="register.html?role=host" class="btn"
+        style="background:white; color:var(--primary-color); padding:15px 30px; font-size:1.1rem;">List Your
+        Adventure</a>
+    </section>
+
+    <!-- 9. Newsletter -->
+    <section class="newsletter-section">
+      <i class="fas fa-envelope-open-text" style="font-size:3rem; margin-bottom:20px;"></i>
+      <h2>Get Adventure Updates</h2>
+      <p>Subscribe to our newsletter for exclusive offers and travel tips.</p>
+      <form class="newsletter-form">
+        <input type="email" class="newsletter-input" placeholder="Enter your email address">
+        <button type="button" class="btn" style="background:#333;">Subscribe</button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- 10. Footer -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <h3>LocalAdventure</h3>
+        <p>Discover and book the best local experiences. We connect travelers with verified hosts for unforgettable
+          journeys.</p>
+        <div style="margin-top:20px; font-size:1.5rem;">
+          <i class="fab fa-facebook" style="margin-right:15px; cursor:pointer;"></i>
+          <i class="fab fa-instagram" style="margin-right:15px; cursor:pointer;"></i>
+          <i class="fab fa-twitter" style="margin-right:15px; cursor:pointer;"></i>
+        </div>
+      </div>
+      <div>
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="adventure-listing.html">All Adventures</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="register.html">Sign Up</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Support</h3>
+        <ul>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+          <li><i class="fas fa-envelope"></i> support@localadventure.com</li>
+          <li><i class="fas fa-map-marker-alt"></i> Bangalore, India</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 Local Adventure Booking. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Homepage Logic
+    async function loadHomepageData() {
+      try {
+        // Fetch Trending (Sort by rating desc)
+        const trendingRes = await fetchClient('/adventures?sort=-averageRating&limit=6');
+        renderCards(trendingRes.data, 'trending-grid');
+
+        // Fetch Featured (Filter by price > 2000 or similar logic, for now just random/limit)
+        // Since API is simple, let's just fetch another set or mix it. 
+        // Let's fetch "Hard" difficulty or high price for "Featured"
+        const featuredRes = await fetchClient('/adventures?difficulty=Hard&limit=4');
+        // Fallback if not enough hard ones
+        const finalFeatured = featuredRes.data.length > 0 ? featuredRes.data : trendingRes.data;
+        renderCards(finalFeatured, 'featured-grid');
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderCards(adventures, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      if (adventures.length === 0) {
+        container.innerHTML = 'No adventures found.';
+        return;
+      }
+
+      adventures.forEach(adv => {
+        const card = document.createElement('div');
+
+        // Custom Layout for Trending Grid
+        if (containerId === 'trending-grid') {
+          card.className = 'trending-card';
+          card.innerHTML = `
+                <div class="trending-img-wrapper">
+                    <span class="trending-badge"><i class="fas fa-fire"></i> Trending</span>
+                    <img src="${adv.image || (adv.images && adv.images[0])}" class="trending-img" alt="${adv.title}" loading="lazy">
+                </div>
+                <div class="trending-content">
+                    <div>
+                        <h3 class="trending-title">${adv.title}</h3>
+                        <div class="trending-meta">
+                            <i class="fas fa-map-marker-alt" style="color:var(--primary-color)"></i> ${adv.city}
+                        </div>
+                        <div class="trending-meta">
+                             <span class="difficulty-badge ${adv.difficulty === 'Easy' ? 'difficulty-easy' : adv.difficulty === 'Medium' ? 'difficulty-medium' : 'difficulty-hard'}">${adv.difficulty}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="trending-price-block">
+                        <div class="trending-price">₹${adv.pricePerPerson} <span>/ person</span></div>
+                        <a href="adventure-details.html?id=${adv._id}" class="btn-view">View</a>
+                    </div>
+                </div>
+            `;
+        } else {
+          // Default Vertical Card for Featured / Other sections
+          card.className = 'card';
+          card.innerHTML = `
+                <div class="card-img-wrapper">
+                    <div class="card-badges">
+                        <span class="badge-overlay badge-difficulty-${adv.difficulty}">${adv.difficulty}</span>
+                    </div>
+                    <img src="${adv.image || (adv.images && adv.images[0])}" class="adventure-img" alt="${adv.title}" loading="lazy">
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">${adv.title}</h3>
+                    <p class="card-location"><i class="fas fa-map-marker-alt" style="color:var(--primary-color)"></i> ${adv.city}</p>
+                    
+                    <div class="card-footer">
+                        <div class="price-info">
+                            <span class="price-label">Starting from</span>
+                            <span class="price-value">₹${adv.pricePerPerson} <span>/ person</span></span>
+                        </div>
+                        <a href="adventure-details.html?id=${adv._id}" class="btn-card">View</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    loadHomepageData();
+  </script>
+</body>
+
+</html>

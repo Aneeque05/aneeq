@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Confirmed!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .confirmation-card {
+            max-width: 600px;
+            margin: 80px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Local<span>Adventure</span></a>
+        </div>
+    </nav>
+
+    <div class="confirmation-card">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h1>Booking Confirmed!</h1>
+        <p style="font-size: 1.2rem; margin: 20px 0; color: #666;">
+            Thank you for your booking. Your adventure awaits!
+        </p>
+        <p style="margin-bottom: 30px;">
+            We have sent a confirmation email to your registered address.
+        </p>
+        <div style="display: flex; gap: 20px; justify-content: center;">
+            <a href="dashboard-user.html" class="btn">View My Bookings</a>
+            <a href="index.html" class="btn btn-secondary">Explore More</a>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>

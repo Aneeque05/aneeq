@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Details | Local Adventure Booking</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/details.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Local<span>Adventure</span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="adventure-listing.html">Adventures</a>
+                <a href="login.html" id="authLink">Login</a>
+                <a href="dashboard-user.html" id="dashboardLink" style="display:none;">Dashboard</a>
+                <a href="#" id="logoutBtn" style="display:none;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" id="main-content">
+        <div id="loading" style="text-align: center; margin-top: 50px;">
+            <i class="fas fa-spinner fa-spin fa-3x"></i><br>Loading details...
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const adventureId = urlParams.get('id');
+        let currentAdventure = null;
+
+        async function loadAdventure() {
+            if (!adventureId) {
+                document.getElementById('main-content').innerHTML = '<div class="alert alert-error" style="display:block">No adventure selected.</div>';
+                return;
+            }
+
+            try {
+                const res = await fetchClient(`/adventures/${adventureId}`);
+                currentAdventure = res.data;
+                const adv = currentAdventure;
+                const user = JSON.parse(localStorage.getItem('user'));
+
+                // Build Highlight Items
+                const highlightsHTML = adv.highlights ? adv.highlights.map(h =>
+                    `<div class="highlight-item"><i class="fas fa-check-circle"></i> ${h}</div>`
+                ).join('') : 'No highlights available.';
+
+                // Build Itinerary
+                const itineraryHTML = adv.itinerary ? adv.itinerary.map((item, idx) => `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-title">Day ${item.day}: ${item.title}</div>
+                        <p>${item.description}</p>
+                    </div>
+                `).join('') : '<p>Itinerary available on request.</p>';
+
+                const mainImage = adv.image || (adv.images && adv.images[0]) || 'https://via.placeholder.com/800x400';
+
+                // Two Column Layout
+                const html = `
+                    <div class="details-layout">
+                        <!-- LEFT COLUMN: Content -->
+                        <div class="details-content">
+                            <img src="${mainImage}" alt="${adv.title}" class="details-hero-img">
+                            
+                            <div class="details-title-section">
+                                <h1>${adv.title}</h1>
+                                
+                                <div class="meta-badges">
+                                    <span class="meta-badge"><i class="fas fa-map-marker-alt"></i> ${adv.location}</span>
+                                    <span class="meta-badge"><i class="fas fa-clock"></i> ${adv.duration}</span>
+                                    <span class="meta-badge" style="background:${adv.difficulty === 'Easy' ? '#e3fcef' : adv.difficulty === 'Medium' ? '#fff7d6' : '#ffebe6'}">
+                                        <i class="fas fa-tachometer-alt"></i> ${adv.difficulty}
+                                    </span>
+                                    <span class="meta-badge"><i class="fas fa-star" style="color:gold"></i> ${adv.averageRating || 'New'} (${adv.reviews ? adv.reviews.length : 0} reviews)</span>
+                                </div>
+                            </div>
+
+                            <div class="section-block">
+                                <h3>Description</h3>
+                                <p>${adv.fullDescription || adv.description}</p>
+                            </div>
+
+                            <div class="section-block">
+                                <h3>Highlights</h3>
+                                <div class="highlights-grid">
+                                    ${highlightsHTML}
+                                </div>
+                            </div>
+
+                            <div class="section-block">
+                                <h3>Itinerary</h3>
+                                <div class="timeline">
+                                    ${itineraryHTML}
+                                </div>
+                            </div>
+
+                             <div class="section-block">
+                                <h3>What's Included</h3>
+                                <div class="highlights-grid">
+                                    ${adv.included ? adv.included.map(i => `<div class="highlight-item"><i class="fas fa-plus" style="color:green"></i> ${i}</div>`).join('') : ''}
+                                </div>
+                            </div>
+
+                            <div class="section-block">
+                                <h3>What's Not Included</h3>
+                                <div class="highlights-grid">
+                                    ${adv.notIncluded ? adv.notIncluded.map(i => `<div class="highlight-item"><i class="fas fa-minus" style="color:red"></i> ${i}</div>`).join('') : ''}
+                                </div>
+                            </div>
+
+                             <div class="section-block">
+                                <h3>Safety Guidelines</h3>
+                                <p class="alert alert-error" style="display:block; background:#fff0f0; color:#d9534f; border-color:#d9534f"><i class="fas fa-shield-alt"></i> ${adv.safetyInfo || 'Standard safety protocols apply.'}</p>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT COLUMN: Sticky Sidebar -->
+                        <aside class="details-sidebar">
+                            <div class="booking-price">₹${adv.pricePerPerson}</div>
+                            <span class="booking-label">per person</span>
+                            
+                             <button id="wishlistBtn" onclick="toggleWishlist()" class="btn btn-secondary" style="width: 100%; margin-bottom: 20px;">
+                                <i class="far fa-heart"></i> Save to Wishlist
+                            </button>
+
+                            <form id="bookingForm" class="booking-form">
+                                <div class="form-group">
+                                    <label>Select Date</label>
+                                    <input type="date" id="bookingDate" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Participants</label>
+                                    <input type="number" id="participants" class="form-control" value="1" min="1" max="${adv.maxSeats}" required onchange="updateTotal()">
+                                </div>
+                                
+                                <div class="total-display">
+                                    <span>Total:</span>
+                                    <span id="totalPrice">₹${adv.pricePerPerson}</span>
+                                </div>
+
+                                <button type="submit" class="btn" style="width: 100%;">Book Adventure</button>
+                            </form>
+                            <div id="bookingMsg" style="margin-top:10px;"></div>
+                        </aside>
+                    </div>
+                `;
+
+                document.getElementById('main-content').innerHTML = html;
+
+                // Setup Date Min
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('bookingDate').setAttribute('min', today);
+
+                // Check wishlist
+                if (user && user.wishlist && user.wishlist.includes(adventureId)) {
+                    const btn = document.getElementById('wishlistBtn');
+                    btn.classList.add('active');
+                    btn.innerHTML = '<i class="fas fa-heart"></i> Saved';
+                }
+
+                // Attach Booking Listener
+                document.getElementById('bookingForm').addEventListener('submit', handleBooking);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('main-content').innerHTML = '<div class="alert alert-error" style="display:block">Error loading adventure details. Please try again later.</div>';
+            }
+        }
+
+        function updateTotal() {
+            if (!currentAdventure) return;
+            const count = parseInt(document.getElementById('participants').value) || 1;
+            const total = count * currentAdventure.pricePerPerson;
+            document.getElementById('totalPrice').innerText = `₹${total}`;
+        }
+
+        async function handleBooking(e) {
+            e.preventDefault();
+            const { token } = checkAuth();
+            if (!token) {
+                alert('Please login to book an adventure');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const date = document.getElementById('bookingDate').value;
+            const participants = document.getElementById('participants').value;
+            const totalPrice = participants * currentAdventure.pricePerPerson;
+
+            const bookingData = {
+                adventure: adventureId,
+                bookingDate: date,
+                participants: participants,
+                totalPrice: totalPrice
+            };
+
+            try {
+                const res = await fetchClient('/bookings', {
+                    method: 'POST',
+                    body: JSON.stringify(bookingData)
+                });
+                window.location.href = 'booking-confirmation.html';
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+        async function toggleWishlist() {
+            const { token } = checkAuth();
+            if (!token) {
+                alert('Please login to save to wishlist');
+                return;
+            }
+
+            try {
+                const res = await fetchClient(`/users/wishlist/${adventureId}`, { method: 'PUT' });
+                const btn = document.getElementById('wishlistBtn');
+
+                // Toggle UI based on class for immediate feedback, verifying with res could be safer but this is faster UX
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    btn.innerHTML = '<i class="far fa-heart"></i> Save to Wishlist';
+                } else {
+                    btn.classList.add('active');
+                    btn.innerHTML = '<i class="fas fa-heart"></i> Saved';
+                }
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+        // Initialize
+        loadAdventure();
+    </script>
+</body>
+
+</html>

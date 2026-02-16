@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventures | Local Adventure Booking</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/card.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .listing-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .filters {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .adventures-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 5px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .adventure-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fas fa-mountain"></i> Local<span>Adventure</span></a>
+            <ul class="nav-links" id="nav-links"></ul>
+        </div>
+    </nav>
+
+    <div class="container listing-container">
+        <aside class="filters">
+            <div class="filter-group">
+                <h3>Search</h3>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name or city...">
+            </div>
+
+            <div class="filter-group">
+                <h3>Category</h3>
+                <label><input type="checkbox" name="category" value="Trekking"> Trekking</label>
+                <label><input type="checkbox" name="category" value="Water"> Water</label>
+                <label><input type="checkbox" name="category" value="Camping"> Camping</label>
+                <label><input type="checkbox" name="category" value="Biking"> Biking</label>
+            </div>
+
+            <div class="filter-group">
+                <h3>Difficulty</h3>
+                <label><input type="checkbox" name="difficulty" value="Easy"> Easy</label>
+                <label><input type="checkbox" name="difficulty" value="Medium"> Medium</label>
+                <label><input type="checkbox" name="difficulty" value="Hard"> Hard</label>
+            </div>
+
+            <button onclick="applyFilters()" class="btn" style="width: 100%">Apply Filters</button>
+        </aside>
+
+        <section id="adventures-grid" class="adventures-grid">
+            <!-- JS will populate -->
+            <div style="grid-column: 1/-1; text-align: center;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i> Loading...
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Parse Query Params
+        const urlParams = new URLSearchParams(window.location.search);
+        let keyword = urlParams.get('keyword') || '';
+        let categoryParam = urlParams.get('category') || '';
+
+        document.getElementById('searchInput').value = keyword;
+
+        // Pre-select category checkbox if present in URL
+        if (categoryParam) {
+            const cb = document.querySelector(`input[name="category"][value="${categoryParam}"]`);
+            if (cb) cb.checked = true;
+        }
+
+        async function loadAdventures(filters = {}) {
+            const grid = document.getElementById('adventures-grid');
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;"><i class="fas fa-spinner fa-spin fa-2x"></i> Loading...</div>';
+
+            let query = '/adventures?';
+
+            // Keyword
+            if (filters.keyword) query += `keyword=${filters.keyword}&`;
+
+            // Categories
+            if (filters.categories && filters.categories.length > 0) {
+                // Simple multi-select handling logic: just pick first for simplicity or build regex if needed
+                // For Mongoose simple find, we might need $in, which our API supports via 'category' param
+                // Our API supports split by comma? No, the simple API implementation earlier supports exact match or standard query string params.
+                // Let's use standard repeat params logic if supported by `qs` or standard express parsing, but standard express is `key=val&key=val2` -> array.
+                // However, the earlier API implementation uses `req.query` directly. Pro API usually needs `?category[in]=Trekking,Water` or similar.
+                // Let's stick to simple "Contains" filtering client side if needed, OR fix API.
+                // Actually, let's just loop and add them. Express default: ?category=A&category=B => req.query.category = ['A', 'B'] -> Mongo { category: ['A', 'B'] } (Wait, equal check on array is exact match).
+                // We need $in.
+                // My generic API code: `queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g...`
+                // So we need to pass ?category[in]=Trekking,Water
+                query += `category[in]=${filters.categories.join(',')}&`;
+            }
+
+            if (filters.difficulties && filters.difficulties.length > 0) {
+                query += `difficulty[in]=${filters.difficulties.join(',')}&`;
+            }
+
+            try {
+                const res = await fetchClient(query);
+                grid.innerHTML = '';
+
+                if (res.data.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">No adventures found matching criteria.</div>';
+                    return;
+                }
+
+                res.data.forEach(adv => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                         <div class="card-img-wrapper">
+                            <div class="card-badges">
+                                <span class="badge-overlay badge-difficulty-${adv.difficulty}">${adv.difficulty}</span>
+                                <span class="badge-overlay">${adv.category}</span>
+                            </div>
+                            <img src="${adv.image || (adv.images && adv.images[0]) || 'https://via.placeholder.com/300'}" class="adventure-img" alt="${adv.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300'">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">${adv.title}</h3>
+                            <p class="card-location"><i class="fas fa-map-marker-alt" style="color:var(--primary-color)"></i> ${adv.city}</p>
+                            <p class="card-desc">${adv.description || 'Experience an amazing adventure with us.'}</p>
+                            
+                            <div class="card-footer">
+                                <div class="price-info">
+                                    <span class="price-label">Starting from</span>
+                                    <span class="price-value">₹${adv.pricePerPerson} <span>/ person</span></span>
+                                </div>
+                                <a href="adventure-details.html?id=${adv._id}" class="btn-card">View Details</a>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div style="color:red">Error loading adventures</div>';
+            }
+        }
+
+        function applyFilters() {
+            const keywordVal = document.getElementById('searchInput').value;
+
+            const catCbs = document.querySelectorAll('input[name="category"]:checked');
+            const categories = Array.from(catCbs).map(cb => cb.value);
+
+            const diffCbs = document.querySelectorAll('input[name="difficulty"]:checked');
+            const difficulties = Array.from(diffCbs).map(cb => cb.value);
+
+            loadAdventures({ keyword: keywordVal, categories, difficulties });
+        }
+
+        // Initial Load
+        const initialCategories = categoryParam ? [categoryParam] : [];
+        loadAdventures({ keyword, categories: initialCategories });
+
+    </script>
+</body>
+
+</html>

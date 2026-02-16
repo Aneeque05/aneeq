@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Local<span>Adventure</span></a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <h2 style="margin-bottom: 20px">Create Account</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <input type="text" id="name" class="form-control" placeholder="Full Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email Address" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" placeholder="Password (Min 6 chars)" required
+                    minlength="6">
+            </div>
+            <div class="form-group">
+                <select id="role" class="form-control">
+                    <option value="user">I want to Explore (User)</option>
+                    <option value="host">I want to Host (Guide/Host)</option>
+                </select>
+            </div>
+            <div id="error" style="color: red; margin-bottom: 10px; display: none;"></div>
+            <button type="submit" class="btn" style="width: 100%;">Register</button>
+        </form>
+        <p style="margin-top: 15px;">Already have an account? <a href="login.html"
+                style="color: var(--primary-color)">Login</a></p>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            try {
+                const res = await fetchClient('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, email, password, role })
+                });
+
+                localStorage.setItem('token', res.token);
+                localStorage.setItem('user', JSON.stringify(res.user));
+
+                // Redirect based on role
+                if (res.user.role === 'admin') window.location.href = 'dashboard-admin.html';
+                else if (res.user.role === 'host') window.location.href = 'dashboard-host.html';
+                else window.location.href = 'dashboard-user.html';
+
+            } catch (err) {
+                const errDiv = document.getElementById('error');
+                errDiv.textContent = err.message;
+                errDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

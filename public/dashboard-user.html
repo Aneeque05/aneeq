@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .booking-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .booking-img {
+            width: 120px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: #e3fcef;
+            color: #00875a;
+        }
+
+        .status-pending {
+            background: #fff7d6;
+            color: #ff991f;
+        }
+
+        .status-cancelled {
+            background: #ffebe6;
+            color: #de350b;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Local<span>Adventure</span></a>
+            <ul class="nav-links" id="nav-links"></ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <h1>Welcome, <span id="userName">User</span></h1>
+
+        <h2 style="margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px;">My Bookings</h2>
+
+        <div id="bookings-list">
+            <i class="fas fa-spinner fa-spin"></i> Loading bookings...
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const { user } = checkAuth();
+        if (!user) {
+            window.location.href = 'login.html';
+        }
+        document.getElementById('userName').textContent = user.name;
+
+        async function loadBookings() {
+            try {
+                const res = await fetchClient('/bookings/mybookings');
+                const container = document.getElementById('bookings-list');
+                container.innerHTML = '';
+
+                if (res.data.length === 0) {
+                    container.innerHTML = '<p style="margin-top: 20px; color: #666;">No bookings found. <a href="adventure-listing.html">Find an adventure!</a></p>';
+                    return;
+                }
+
+                res.data.forEach(booking => {
+                    const adv = booking.adventure;
+                    const date = new Date(booking.bookingDate).toLocaleDateString();
+
+                    const div = document.createElement('div');
+                    div.className = 'booking-card';
+                    div.innerHTML = `
+                        <img src="${adv && adv.images ? adv.images[0] : ''}" class="booking-img" onerror="this.src='https://via.placeholder.com/150'">
+                        <div style="flex: 1;">
+                            <h3>${adv ? adv.title : 'Deleted Adventure'}</h3>
+                            <p><i class="fas fa-map-marker-alt"></i> ${adv ? adv.city : 'Unknown'}</p>
+                            <p>Date: <strong>${date}</strong> | Participants: ${booking.participants}</p>
+                            <p>Total: <strong>₹${booking.totalPrice}</strong></p>
+                        </div>
+                        <div>
+                            <span class="status status-${booking.status}">${booking.status}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('bookings-list').innerHTML = 'Error loading bookings';
+            }
+        }
+
+        loadBookings();
+    </script>
+</body>
+
+</html>
